@@ -1,4 +1,5 @@
 // components/ErrorBoundary.js
+"use client"
 import { useState, useEffect } from 'react';
 
 const ErrorBoundary = ({ children }) => {

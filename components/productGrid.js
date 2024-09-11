@@ -1,7 +1,9 @@
-// components/ProductGrid.js
-import Link from 'next/link';
+// app/components/ProductGrid.js
+"use client"
+
 import { useState, useEffect } from 'react';
-import { getProducts, getCategories } from '../api/products';
+import ProductCard from './ProductCard';
+import { getProducts, getCategories } from '../lib/api';
 
 const ProductGrid = ({ onProductClick }) => {
   const [products, setProducts] = useState([]);
@@ -52,7 +54,7 @@ const ProductGrid = ({ onProductClick }) => {
 
   return (
     <div>
-      <div className="filters">
+      {/* <div className="filters">
         <select value={sort} onChange={handleSortChange}>
           <option value="">Sort By</option>
           <option value="price_asc">Price: Low to High</option>
@@ -67,16 +69,11 @@ const ProductGrid = ({ onProductClick }) => {
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
 
       <div className="grid grid-cols-4 gap-4">
         {products.map((product) => (
-          <div key={product.id} className="border p-4" onClick={() => onProductClick(product)}>
-            <img src={product.image} alt={product.title} className="w-full h-40 object-cover" />
-            <h2>{product.title}</h2>
-            <p>{product.price} USD</p>
-            <p>Category: {product.category}</p>
-          </div>
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
 

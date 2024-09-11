@@ -1,4 +1,4 @@
-// components/Modal.js
+// app/components/Modal.js
 const Modal = ({ product, onClose }) => {
     if (!product) return null;
   
@@ -9,9 +9,9 @@ const Modal = ({ product, onClose }) => {
           <h1>{product.title}</h1>
           <img src={product.image} alt={product.title} className="w-full h-60 object-cover" />
           <p>{product.description}</p>
-          <p>Price: {product.price} USD</p>
+          <p>Price: {product.price}</p>
           <p>Category: {product.category}</p>
-          <p>Rating: {product.rating.rate} / 5</p>
+          <p>Rating: {product.rating} </p>
         </div>
       </div>
     );
