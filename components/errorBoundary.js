@@ -19,3 +19,6 @@ const ErrorBoundary = ({ children }) => {
       )}
     </div>
   );
+};
+
+export default ErrorBoundary;
