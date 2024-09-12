@@ -12,7 +12,7 @@ export default async function ProductDetailPage({ params }) {
       <h1>{product.title}</h1>
       <img src={product.images[0]} alt={product.title} className="w-full h-60 object-contain" />
       <p>{product.description}</p>
-      <p>Price: {product.price} USD</p>
+      <p>Price: {product.price}</p>
       <p>Category: {product.category}</p>
       <p>Rating: {product.rating} </p>
     </div>

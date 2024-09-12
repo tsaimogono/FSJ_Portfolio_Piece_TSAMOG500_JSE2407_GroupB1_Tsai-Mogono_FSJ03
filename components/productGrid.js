@@ -54,22 +54,6 @@ const ProductGrid = ({ onProductClick }) => {
 
   return (
     <div>
-      {/* <div className="filters">
-        <select value={sort} onChange={handleSortChange}>
-          <option value="">Sort By</option>
-          <option value="price_asc">Price: Low to High</option>
-          <option value="price_desc">Price: High to Low</option>
-        </select>
-
-        <select value={selectedCategory} onChange={handleCategoryChange}>
-          <option value="">All Categories</option>
-          {categories.map((category) => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-        </select>
-      </div> */}
 
       <div className="grid grid-cols-4 gap-4">
         {products.map((product) => (
