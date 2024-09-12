@@ -1,0 +1,33 @@
+
+import React from 'react';
+
+const Pagination = ({ page, handlePageChange }) => {
+  return React.createElement(
+    'div',
+    { className: 'mt-6 flex justify-center space-x-4' },
+    React.createElement(
+      'button',
+      {
+        onClick: () => handlePageChange(page - 1),
+        disabled: page === 1,
+        className: 'bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 disabled:opacity-50',
+      },
+      'Previous'
+    ),
+    React.createElement(
+      'span',
+      { className: 'text-lg font-bold text-gray-700' },
+      `Page ${page}`
+    ),
+    React.createElement(
+      'button',
+      {
+        onClick: () => handlePageChange(page + 1),
+        className: 'bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600',
+      },
+      'Next'
+    )
+  );
+};
+
+export default Pagination;
