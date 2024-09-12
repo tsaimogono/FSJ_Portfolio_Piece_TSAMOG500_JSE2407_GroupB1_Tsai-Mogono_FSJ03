@@ -1,5 +1,5 @@
-// components/ErrorBoundary.js
-"use client"
+// app/components/ErrorBoundary.js
+"use client";
 import { useState, useEffect } from 'react';
 
 const ErrorBoundary = ({ children }) => {
@@ -11,15 +11,7 @@ const ErrorBoundary = ({ children }) => {
     }
   }, [error]);
 
-  return (
-    <div>
-      {error ? (
-        <p>Error: {error.message}</p>
-      ) : (
-        children
-      )}
-    </div>
-  );
+  return error ? <p>Error: {error.message}</p> : children;
 };
 
 export default ErrorBoundary;

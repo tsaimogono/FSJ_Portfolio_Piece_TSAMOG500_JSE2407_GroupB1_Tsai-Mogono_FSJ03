@@ -1,9 +1,9 @@
 // app/page.js
-
-"use client"
+"use client";
 import { useState } from 'react';
-import ProductGrid from '../components/productGrid';
-import Modal from '../components/modal';
+import ProductGrid from '@/components/productGrid';
+import Modal from '@/components/modal';
+import Navbar from '@/components/Navbar';
 
 const Home = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -18,7 +18,8 @@ const Home = () => {
 
   return (
     <div>
-      <h1>Product List</h1>
+      <Navbar />
+      <h1 className="text-3xl font-bold text-center my-6">Product List</h1>
       <ProductGrid onProductClick={handleProductClick} />
       {selectedProduct && <Modal product={selectedProduct} onClose={closeModal} />}
     </div>
