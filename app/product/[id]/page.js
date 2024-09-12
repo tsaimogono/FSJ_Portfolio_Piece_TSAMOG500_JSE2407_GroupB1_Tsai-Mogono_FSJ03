@@ -110,10 +110,32 @@ export default function ProductDetailPage({ params }) {
           <div className="flex items-center mb-4">
             <span className="mr-2 text-yellow-500">Rating:</span>
             <div className="flex">{stars}</div>
-            <span className="ml-2 text-gray-600">({product.rating?.count || 0} reviews)</span>
+            <span className="ml-2 text-gray-600">({product.rating || 0} reviews)</span>
             <span className="ml-2 text-gray-600">{ratingValue}</span>
           </div>
           <p className="text-gray-700 mb-4">{product.description}</p>
+
+          {/* Reviews Section */}
+          <div className="mt-8">
+            <h2 className="text-2xl font-semibold">Reviews</h2>
+            {product.reviews && product.reviews.length > 0 ? (
+              product.reviews.map((review) => (
+                <div
+                  key={review.id}
+                  className="mt-4 p-4 border rounded-lg shadow"
+                >
+                  <p>
+                    <strong>{review.reviewerName}</strong> (
+                    {new Date(review.date).toLocaleDateString()})
+                  </p>
+                  <p>Rating: {review.rating}</p>
+                  <p>{review.comment}</p>
+                </div>
+              ))
+            ) : (
+              <p>No reviews available.</p>
+            )}
+          </div>
         </div>
       </div>
     </div>
