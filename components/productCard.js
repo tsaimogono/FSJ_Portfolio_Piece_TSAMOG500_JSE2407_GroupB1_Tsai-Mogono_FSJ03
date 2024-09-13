@@ -45,8 +45,8 @@ const ProductCard = ({ product }) => {
         )}
       </div>
       <h2 className="text-lg font-bold mt-2">{product.title}</h2>
-      <p className="text-green-600 font-bold">${product.price}</p>
-      <p className="text-gray-500">{product.category}</p>
+      <p className="text-purple-900 font-bold">${product.price}</p>
+      <p className="text-gray-800">{product.category}</p>
       <Link href={`/product/${product.id}`}>
         <button className="bg-gray-500 text-white py-2 px-4 mt-2 rounded-lg transition duration-300 hover:bg-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
           View Details
