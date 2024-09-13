@@ -97,10 +97,10 @@ export default function ProductDetailPage({ params }) {
         {/* Product Information */}
         <div className="flex flex-col justify-between">
           <h1 className="text-3xl font-bold mb-4">{product.title}</h1>
-          <p className="text-lg text-green-500 font-semibold">Price: ${product.price}</p>
+          <p className="text-lg text-purple-900 font-semibold">Price: ${product.price}</p>
           <p className="text-gray-600 mb-2">Category: {product.category}</p>
           <div className="flex items-center mb-4">
-            <span className="mr-2 text-yellow-500">Rating:</span>
+            <span className="mr-2 text-yellow-400">Rating:</span>
             <div className="flex">{stars}</div>
             <span className="ml-2 text-gray-600">({product.rating?.count || 0} reviews)</span>
             <span className="ml-2 text-gray-600">{ratingValue} / 5</span>
@@ -130,7 +130,7 @@ export default function ProductDetailPage({ params }) {
                       fill="currentColor"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
-                      className="w-4 h-4 text-yellow-500"
+                      className="w-4 h-4 text-yellow-400"
                     >
                       <path
                         strokeLinecap="round"
@@ -151,7 +151,7 @@ export default function ProductDetailPage({ params }) {
 
         {/* Write a Review Section */}
         <div className="mt-8">
-          <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300">
+          <button className="bg-gray-600 text-white py-2 px-4 rounded hover:bg-purple-400 transition duration-300">
             Write a Review
           </button>
         </div>
