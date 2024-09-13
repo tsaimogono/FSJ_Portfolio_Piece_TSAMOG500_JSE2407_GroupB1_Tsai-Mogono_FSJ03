@@ -1,8 +1,8 @@
 
-Swiftstore
+### Swiftstore
 This project is a fully functional e-commerce store built with Next.js. It fetches product data from the Next E-Commerce API and displays products with pagination, product details, and a review system. Users can browse products, view detailed product information, and navigate between different pages of products.
 
-Table of Contents
+### Table of Contents
 Features
 Technologies Used
 Project Setup
@@ -59,7 +59,8 @@ Open the app in the browser:
 bash
 Copy code
 http://localhost:3000
-File Structure
+
+###  File Structure
 bash
 Copy code
 nextjs-ecommerce-store/
