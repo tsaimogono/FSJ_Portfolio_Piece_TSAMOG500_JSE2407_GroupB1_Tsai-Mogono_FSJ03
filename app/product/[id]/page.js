@@ -2,7 +2,11 @@
 import { getProduct } from '../../../lib/api';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-
+/**
+ * Loader Component
+ * Displays a loading spinner while content is being fetched.
+ * @returns {JSX.Element} Loader component with a spinner.
+ */
 // Loader Component
 function Loader() {
   return (
@@ -11,6 +15,17 @@ function Loader() {
     </div>
   );
 }
+
+/**
+ * ProductDetailPage Component
+ * Fetches and displays detailed information about a product, including images, price, category, rating, and reviews.
+ * 
+ * @param {Object} props - The component props.
+ * @param {Object} props.params - The route parameters.
+ * @param {string} props.params.id - The ID of the product to fetch details for.
+ * 
+ * @returns {JSX.Element} The product detail page.
+ */
 
 export default function ProductDetailPage({ params }) {
   const [product, setProduct] = useState(null);
@@ -50,12 +65,23 @@ export default function ProductDetailPage({ params }) {
     </svg>
   ));
 
+
+  /**
+   * Handle the previous image in the carousel.
+   * Switches to the previous image in the product's image list.
+   */
+
   const handlePrevImage = () => {
     setCurrentImageIndex((prevIndex) =>
       prevIndex === 0 ? product.images.length - 1 : prevIndex - 1
     );
   };
 
+
+  /**
+   * Handle the next image in the carousel.
+   * Switches to the next image in the product's image list.
+   */
   const handleNextImage = () => {
     setCurrentImageIndex((prevIndex) =>
       prevIndex === product.images.length - 1 ? 0 : prevIndex + 1
