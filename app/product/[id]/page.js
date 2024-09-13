@@ -128,8 +128,7 @@ export default function ProductDetailPage({ params }) {
           <div className="flex items-center mb-4">
             <span className="mr-2 text-yellow-400">Rating:</span>
             <div className="flex">{stars}</div>
-            <span className="ml-2 text-gray-600">({product.rating?.count || 0} reviews)</span>
-            <span className="ml-2 text-gray-600">{ratingValue} / 5</span>
+            <span className="ml-1 text-gray-600">{product.rating.toFixed(1) || 0}</span>
           </div>
           <p className="text-gray-700 mb-4">{product.description}</p>
         </div>
