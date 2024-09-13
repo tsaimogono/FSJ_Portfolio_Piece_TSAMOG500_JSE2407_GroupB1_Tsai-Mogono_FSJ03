@@ -2,9 +2,23 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
+/**
+ * ProductCard Component
+ * Displays product information such as title, price, category, and image. 
+ * Includes image carousel functionality and a link to the product details page.
+ * 
+ * @param {Object} props - The component props.
+ * @param {Object} props.product - The product object containing details like title, price, images, and category.
+ * 
+ * @returns {JSX.Element} The ProductCard component.
+ */
+
 const ProductCard = ({ product }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  /**
+   * Handle switching to the next image in the product's image array.
+   */
   const nextImage = () => {
     if (currentImageIndex < product.images.length - 1) {
       setCurrentImageIndex(currentImageIndex + 1);

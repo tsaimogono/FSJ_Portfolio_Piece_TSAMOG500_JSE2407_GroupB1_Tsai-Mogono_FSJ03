@@ -1,5 +1,16 @@
 
 import React from 'react';
+/**
+ * Pagination Component
+ * Renders pagination controls to navigate between pages of content.
+ * Displays "Previous" and "Next" buttons along with the current page number.
+ * 
+ * @param {Object} props - The component props.
+ * @param {number} props.page - The current page number.
+ * @param {Function} props.handlePageChange - Function to handle page changes when the user clicks the "Previous" or "Next" buttons.
+ * 
+ * @returns {JSX.Element} The Pagination component.
+ */
 
 const Pagination = ({ page, handlePageChange }) => {
   return React.createElement(
