@@ -1,68 +1,76 @@
-// ProductGrid.jsx
-import React, { useState, useEffect } from 'react';
-import Pagination from './Pagination.js';
+"use client";
+import { useState, useEffect } from 'react';
+import ProductCard from './productCard';
+import { getProducts } from '../lib/api';
+import Pagination from './Pagination';
 
+/**
+ * ProductGrid Component
+ * Fetches and displays a grid of products along with pagination controls.
+ * Handles the loading state, error state, and page changes.
+ * 
+ * @param {Object} props - The component props.
+ * @param {Function} props.onProductClick - Function that handles clicking a product card to display details.
+ * 
+ * @returns {JSX.Element} The ProductGrid component.
+ */
+const ProductGrid = ({ onProductClick }) => {
+  const [products, setProducts] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  // State for search, category, and sort
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('');
+  const [sort, setSort] = useState('asc');
 
-
-const ProductGrid = () => {
-  const [products, setProducts] = useState([]); // Store product data
-  const [search, setSearch] = useState(''); // Search query
-  const [category, setCategory] = useState(''); // Selected category
-  const [sort, setSort] = useState('asc'); // Sort order
-  const [currentPage, setCurrentPage] = useState(1);
-  const [productsPerPage] = useState(20); // Items per page
-
+  // Fetch products when the page changes
   useEffect(() => {
-    // Simulating fetching products from an API
     const fetchProducts = async () => {
-      // This should be replaced with your API call
-      const response = await fetch('/api/products'); // Adjust this path
-      const data = await response.json();
-      setProducts(data);
+      setLoading(true);
+      try {
+        const data = await getProducts(page, 20);
+        setProducts(data);
+      } catch (err) {
+        setError('Failed to load products');
+      } finally {
+        setLoading(false);
+      }
     };
-    
     fetchProducts();
-  }, []);
+  }, [page]);
 
-  // Handle filtering, sorting, and searching
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+
+  // Filter and sort products
   const filteredProducts = products
-    .filter(product => product.title.toLowerCase().includes(search.toLowerCase()))
-    .filter(product => !category || product.category === category)
+    .filter((product) =>
+      product.title.toLowerCase().includes(search.toLowerCase())
+    )
+    .filter((product) => !category || product.category === category)
     .sort((a, b) => (sort === 'asc' ? a.price - b.price : b.price - a.price));
 
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-  
-  // Get current products to display
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
-
-  const handlePageChange = (page) => {
-    if (page < 1 || page > totalPages) return; // Prevent out-of-bound pages
-    setCurrentPage(page);
-  };
-
-  const resetFilters = () => {
-    setSearch('');
-    setCategory('');
-    setSort('asc');
-    setCurrentPage(1);
-  };
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
     <div>
-      <div>
+      {/* Search, Filter, and Sort controls */}
+      <div className="mb-4">
         <input
           type="text"
           placeholder="Search by title..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className='border p-2'
+          className="border p-2"
         />
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className='border p-2'
+          className="border p-2 mx-2"
         >
           <option value="">All Categories</option>
           <option value="electronics">Electronics</option>
@@ -73,32 +81,37 @@ const ProductGrid = () => {
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value)}
-          className='border p-2'
+          className="border p-2"
         >
           <option value="asc">Sort by Price: Low to High</option>
           <option value="desc">Sort by Price: High to Low</option>
         </select>
-        <button onClick={resetFilters} className='bg-red-500 text-white p-2'>
+        <button
+          onClick={() => {
+            setSearch('');
+            setCategory('');
+            setSort('asc');
+            setPage(1);
+          }}
+          className="bg-red-500 text-white p-2 ml-2"
+        >
           Reset
         </button>
       </div>
 
-      <div className='grid grid-cols-4 gap-4 mt-4'>
-        {currentProducts.map((product) => (
-          <div key={product.id} className='border p-4'>
-            <h3>{product.title}</h3>
-            <p>Price: ${product.price}</p>
-            <p>Category: {product.category}</p>
-            {/* Add more product details as needed */}
-          </div>
+      {/* Product Grid */}
+      <div className="grid grid-cols-4 gap-6">
+        {filteredProducts.map((product) => (
+          <ProductCard
+            key={product.id}
+            product={product}
+            onClick={() => onProductClick(product)}
+          />
         ))}
       </div>
 
-      <Pagination
-        page={currentPage}
-        totalPages={totalPages}
-        handlePageChange={handlePageChange}
-      />
+      {/* Pagination Controls */}
+      <Pagination page={page} handlePageChange={handlePageChange} />
     </div>
   );
 };
