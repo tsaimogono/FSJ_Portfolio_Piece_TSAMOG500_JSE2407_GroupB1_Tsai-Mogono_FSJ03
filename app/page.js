@@ -72,31 +72,6 @@ const Home = () => {
       <div className="container mx-auto p-4">
         <h1 className="text-3xl font-bold text-center my-6">Product List</h1>
 
-        {/* Search, Filter, Sort */}
-        {/* <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Search by title"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            className="border p-2 rounded mr-4"
-          />
-          <select value={category} onChange={handleCategoryChange} className="border p-2 rounded mr-4">
-            <option value="">All Categories</option>
-          </select>
-          <select value={sort} onChange={handleSortChange} className="border p-2 rounded">
-            <option value="">Sort by</option>
-            <option value="price_asc">Price: Low to High</option>
-            <option value="price_desc">Price: High to Low</option>
-          </select>
-          <button onClick={handleSearchSubmit} className="bg-blue-500 text-white py-2 px-4 rounded ml-4">
-            Search
-          </button>
-          <button onClick={resetFilters} className="bg-gray-500 text-white py-2 px-4 rounded ml-4">
-            Reset Filters
-          </button>
-        </div> */}
-
         <ProductGrid
           searchQuery={searchQuery}
           category={category}
