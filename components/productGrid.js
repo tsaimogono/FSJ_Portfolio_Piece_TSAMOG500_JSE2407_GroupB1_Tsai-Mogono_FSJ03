@@ -1,117 +1,161 @@
-"use client";
-import { useState, useEffect } from 'react';
+"use client"
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import ProductCard from './productCard';
-import { getProducts } from '../lib/api';
 import Pagination from './Pagination';
+import { getProducts, getCategories } from '../lib/api';
 
-/**
- * ProductGrid Component
- * Fetches and displays a grid of products along with pagination controls.
- * Handles the loading state, error state, and page changes.
- * 
- * @param {Object} props - The component props.
- * @param {Function} props.onProductClick - Function that handles clicking a product card to display details.
- * 
- * @returns {JSX.Element} The ProductGrid component.
- */
-const ProductGrid = ({ onProductClick }) => {
+const ProductGrid = () => {
   const [products, setProducts] = useState([]);
-  const [page, setPage] = useState(1);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  // State for search, category, and sort
-  const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('');
-  const [sort, setSort] = useState('asc');
+  const [totalPages, setTotalPages] = useState(1);
 
-  // Fetch products when the page changes
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const search = searchParams.get('search') || '';
+  const category = searchParams.get('category') || '';
+  const sortBy = searchParams.get('sortBy') || 'id';
+  const order = searchParams.get('order') || 'asc';
+  const page = parseInt(searchParams.get('page') || '1', 10);
+  const limit = 20; 
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const fetchedCategories = await getCategories();
+        setCategories(fetchedCategories);
+      } catch (err) {
+        console.error('Failed to fetch categories:', err);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
+      setError(null);
       try {
-        const data = await getProducts(page, 20);
-        setProducts(data);
+        const data = await getProducts({
+          page,
+          limit,
+          sortBy,
+          order,
+          category,
+          search
+        });
+        setProducts(data.products);
+        setTotalPages(Math.ceil(data.total / limit));
       } catch (err) {
         setError('Failed to load products');
+        console.error('Error fetching products:', err);
       } finally {
         setLoading(false);
       }
     };
     fetchProducts();
-  }, [page]);
+  }, [page, sortBy, order, category, search, limit]);
 
-  const handlePageChange = (newPage) => {
-    setPage(newPage);
+  const updateUrl = (newParams) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(newParams).forEach(([key, value]) => {
+      if (value) {
+        params.set(key, value);
+      } else {
+        params.delete(key);
+      }
+    });
+    router.push(`/?${params.toString()}`);
   };
 
-  // Filter and sort products
-  const filteredProducts = products
-    .filter((product) =>
-      product.title.toLowerCase().includes(search.toLowerCase())
-    )
-    .filter((product) => !category || product.category === category)
-    .sort((a, b) => (sort === 'asc' ? a.price - b.price : b.price - a.price));
+  const handleSearch = (e) => {
+    e.preventDefault();
+    updateUrl({ search: e.target.search.value, page: 1 });
+  };
+
+  const handleCategoryChange = (e) => {
+    updateUrl({ category: e.target.value, page: 1 });
+  };
+
+  const handleSortChange = (e) => {
+    const [newSortBy, newOrder] = e.target.value.split('-');
+    updateUrl({ sortBy: newSortBy, order: newOrder, page: 1 });
+  };
+
+  const handlePageChange = (newPage) => {
+    updateUrl({ page: newPage });
+  };
+
+  const resetFilters = () => {
+    router.push('/');
+  };
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
   return (
-    <div>
-      {/* Search, Filter, and Sort controls */}
-      <div className="mb-4">
+    <div className="container mx-auto px-4">
+      <form onSubmit={handleSearch} className="mb-4">
         <input
           type="text"
-          placeholder="Search by title..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="border p-2"
+          name="search"
+          placeholder="Search products..."
+          defaultValue={search}
+          className="border p-2 mr-2"
         />
+        <button type="submit" className="bg-blue-500 text-white p-2">
+          Search
+        </button>
+      </form>
+
+      <div className="mb-4">
         <select
           value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="border p-2 mx-2"
+          onChange={handleCategoryChange}
+          className="border p-2 mr-2"
         >
           <option value="">All Categories</option>
-          <option value="electronics">Electronics</option>
-          <option value="books">Books</option>
-          <option value="clothing">Clothing</option>
-          {/* Add more categories as needed */}
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
         </select>
+
         <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value)}
-          className="border p-2"
+          value={`${sortBy}-${order}`}
+          onChange={handleSortChange}
+          className="border p-2 mr-2"
         >
-          <option value="asc">Sort by Price: Low to High</option>
-          <option value="desc">Sort by Price: High to Low</option>
+          <option value="id-asc">Sort by ID (Ascending)</option>
+          <option value="id-desc">Sort by ID (Descending)</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="rating-desc">Top Rated</option>
         </select>
+
         <button
-          onClick={() => {
-            setSearch('');
-            setCategory('');
-            setSort('asc');
-            setPage(1);
-          }}
-          className="bg-red-500 text-white p-2 ml-2"
+          onClick={resetFilters}
+          className="bg-red-500 text-white p-2"
         >
-          Reset
+          Reset Filters
         </button>
       </div>
 
-      {/* Product Grid */}
-      <div className="grid grid-cols-4 gap-6">
-        {filteredProducts.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            onClick={() => onProductClick(product)}
-          />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {products.map((product) => (
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
 
-      {/* Pagination Controls */}
-      <Pagination page={page} handlePageChange={handlePageChange} />
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        handlePageChange={handlePageChange}
+      />
     </div>
   );
 };

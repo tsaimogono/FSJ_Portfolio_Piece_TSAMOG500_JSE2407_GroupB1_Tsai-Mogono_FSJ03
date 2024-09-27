@@ -10,15 +10,12 @@ import { useState } from 'react';
  * 
  * @returns {JSX.Element} The ProductCard component.
  */
+
 const ProductCard = ({ product }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  /**
-   * Safely calculate the product's rating (rounded), fallback to 0 if product.rating or product.rating.rate is undefined.
-   */
-  const ratingValue = product.rating ? Math.round(product.rating) : 0;
-
   // Generate star elements based on the rating value
+  const ratingValue = product.rating ? Math.round(product.rating) : 0;
   const stars = Array(ratingValue).fill().map((_, i) => (
     <svg
       key={i}
@@ -37,24 +34,6 @@ const ProductCard = ({ product }) => {
     </svg>
   ));
 
-  /**
-   * Handle switching to the next image in the product's image array.
-   */
-  const nextImage = () => {
-    if (currentImageIndex < product.images.length - 1) {
-      setCurrentImageIndex(currentImageIndex + 1);
-    }
-  };
-
-  /**
-   * Handle switching to the previous image in the product's image array.
-   */
-  const prevImage = () => {
-    if (currentImageIndex > 0) {
-      setCurrentImageIndex(currentImageIndex - 1);
-    }
-  };
-
   return (
     <div className="border p-4 rounded-lg shadow-lg bg-white">
       <div className="relative">
@@ -66,14 +45,14 @@ const ProductCard = ({ product }) => {
         {product.images.length > 1 && (
           <div className="absolute top-0 left-0 w-full h-full flex justify-between items-center px-2">
             <button
-              onClick={prevImage}
+              onClick={() => setCurrentImageIndex(currentImageIndex - 1)}
               className="bg-gray-800 text-white p-1 rounded"
               disabled={currentImageIndex === 0}
             >
               ‹
             </button>
             <button
-              onClick={nextImage}
+              onClick={() => setCurrentImageIndex(currentImageIndex + 1)}
               className="bg-gray-800 text-white p-1 rounded"
               disabled={currentImageIndex === product.images.length - 1}
             >
@@ -85,13 +64,10 @@ const ProductCard = ({ product }) => {
       <h2 className="text-lg font-bold mt-2">{product.title}</h2>
       <p className="text-purple-900 font-bold">${product.price}</p>
       <p className="text-gray-800">{product.category}</p>
-
-      {/* Rating Display */}
       <div className="flex items-center mt-2">
         {stars}
-        <span className="ml-2 text-gray-600">{product.rating.toFixed(1) || 0}</span>
+        <span className="ml-2 text-gray-600">{product.rating.toFixed(1)}</span>
       </div>
-
       <Link href={`/product/${product.id}`}>
         <button className="bg-gray-500 text-white py-2 px-4 mt-2 rounded-lg transition duration-300 hover:bg-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
           View Details

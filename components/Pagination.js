@@ -1,34 +1,47 @@
 import React from 'react';
 
-/**
- * Pagination Component
- * Renders pagination controls to navigate between pages of content.
- * Displays "Previous" and "Next" buttons along with the current page number.
- * 
- * @param {Object} props - The component props.
- * @param {number} props.page - The current page number.
- * @param {number} props.totalPages - The total number of pages.
- * @param {Function} props.handlePageChange - Function to handle page changes.
- * 
- * @returns {JSX.Element} The Pagination component.
- */
 const Pagination = ({ page, totalPages, handlePageChange }) => {
+  const pageNumbers = [];
+  const maxVisiblePages = 5;
+
+  // Calculate the range of page numbers to display
+  let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
+  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+  if (endPage - startPage + 1 < maxVisiblePages) {
+    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    pageNumbers.push(i);
+  }
+
   return (
-    <div className='mt-6 flex justify-center space-x-4'>
+    <div className="mt-6 flex justify-center items-center space-x-2">
       <button
         onClick={() => handlePageChange(page - 1)}
         disabled={page === 1}
-        className='bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 disabled:opacity-50'
+        className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50"
       >
         Previous
       </button>
-      {/* <span className='text-lg font-bold text-gray-700'>
-        Page {page} of {totalPages}
-      </span> */}
+      {pageNumbers.map((number) => (
+        <button
+          key={number}
+          onClick={() => handlePageChange(number)}
+          className={`px-3 py-1 rounded ${
+            page === number
+              ? 'bg-blue-500 text-white'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
+        >
+          {number}
+        </button>
+      ))}
       <button
         onClick={() => handlePageChange(page + 1)}
         disabled={page === totalPages}
-        className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
+        className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50"
       >
         Next
       </button>
