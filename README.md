@@ -33,7 +33,7 @@ Getting Started
 Prerequisites
 
 Node.js (v14 or later)
-npm or yarn
+npm 
 
 ## Installation
 
@@ -45,13 +45,9 @@ Copycd nextjs-ecommerce-catalog
 
 Install dependencies:
 Copynpm install
-or
-Copyyarn install
 
 Run the development server:
 Copynpm run dev
-or
-Copyyarn dev
 
 Open http://localhost:3000 in your browser to view the application.
 
