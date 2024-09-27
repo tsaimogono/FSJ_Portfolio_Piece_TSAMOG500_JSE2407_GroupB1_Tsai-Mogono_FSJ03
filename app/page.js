@@ -44,28 +44,6 @@ const Home = () => {
       <Navbar />
       <div className="container mx-auto p-4">
         <h1 className="text-3xl font-bold text-center my-6">Product List</h1>
-
-        {/* <div className="flex justify-between mb-4">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="border p-2 rounded"
-          />
-          <select value={category} onChange={(e) => setCategory(e.target.value)} className="border p-2 rounded">
-            <option value="">All Categories</option>
-            <option value="electronics">Electronics</option>
-            <option value="fashion">Fashion</option>
-          </select>
-          <select value={sort} onChange={(e) => setSort(e.target.value)} className="border p-2 rounded">
-            <option value="asc">Price: Low to High</option>
-            <option value="desc">Price: High to Low</option>
-          </select>
-          <button onClick={handleSearchSubmit} className="bg-blue-500 text-white px-4 py-2 rounded">Search</button>
-          <button onClick={resetFilters} className="bg-red-500 text-white px-4 py-2 rounded">Reset</button>
-        </div> */}
-
         <ProductGrid
           searchQuery={searchQuery}
           category={category}
