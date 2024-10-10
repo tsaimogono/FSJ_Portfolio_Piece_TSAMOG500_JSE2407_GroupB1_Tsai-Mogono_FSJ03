@@ -5,7 +5,8 @@ export async function GET(req, { params }) {
   const { id } = params;
 
   try {
-    const productRef = doc(db, "products", id);
+    const paddedId = id.toString().padStart(3, "0");
+    const productRef = doc(db, "products", paddedId);
     const productSnap = await getDoc(productRef);
 
     if (!productSnap.exists()) {
