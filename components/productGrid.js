@@ -1,16 +1,39 @@
 "use client"
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import ProductCard from './productCard';
 import Pagination from './Pagination';
 import { getProducts, getCategories } from '../lib/api';
+
+// Custom debounce function
+const useDebounce = (callback, delay) => {
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  return useCallback((...args) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      callback(...args);
+    }, delay);
+  }, [callback, delay]);
+};
 
 const ProductGrid = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -20,13 +43,34 @@ const ProductGrid = () => {
   const sortBy = searchParams.get('sortBy') || 'id';
   const order = searchParams.get('order') || 'asc';
   const page = parseInt(searchParams.get('page') || '1', 10);
-  const limit = 20; 
+  const limit = 20;
+
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getProducts({
+        page,
+        limit,
+        sortBy,
+        order,
+        category: category === "All Categories" ? "" : category,
+        search
+      });
+      setProducts(data.products);
+      setTotalProducts(data.total);
+    } catch (err) {
+      setError('Failed to load products');
+      console.error('Error fetching products:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, sortBy, order, category, search, limit]);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const fetchedCategories = await getCategories();
-        console.log(fetchedCategories)
         setCategories(fetchedCategories.categories);
       } catch (err) {
         console.error('Failed to fetch categories:', err);
@@ -36,31 +80,10 @@ const ProductGrid = () => {
   }, []);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await getProducts({
-          page,
-          limit,
-          sortBy,
-          order,
-          category,
-          search
-        });
-        setProducts(data.products);
-        setTotalPages(Math.ceil(data.total / limit));
-      } catch (err) {
-        setError('Failed to load products');
-        console.error('Error fetching products:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchProducts();
-  }, [page, sortBy, order, category, search, limit]);
+  }, [fetchProducts]);
 
-  const updateUrl = (newParams) => {
+  const updateUrl = useCallback((newParams) => {
     const params = new URLSearchParams(searchParams.toString());
     Object.entries(newParams).forEach(([key, value]) => {
       if (value) {
@@ -70,7 +93,11 @@ const ProductGrid = () => {
       }
     });
     router.push(`/?${params.toString()}`);
-  };
+  }, [searchParams, router]);
+
+  const debouncedSearch = useDebounce((value) => {
+    updateUrl({ search: value, page: 1 });
+  }, 300);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -94,8 +121,10 @@ const ProductGrid = () => {
     router.push('/');
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return <div className="flex justify-center items-center h-64">Loading...</div>;
+  if (error) return <div className="text-red-500 text-center">{error}</div>;
+
+  const totalPages = Math.ceil(totalProducts / limit);
 
   return (
     <div className="container mx-auto px-4">
@@ -105,20 +134,21 @@ const ProductGrid = () => {
           name="search"
           placeholder="Search products..."
           defaultValue={search}
-          className="border p-2 mr-2"
+          onChange={(e) => debouncedSearch(e.target.value)}
+          className="border p-2 mr-2 rounded"
         />
-        <button type="submit" className="bg-blue-500 text-white p-2">
+        <button type="submit" className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-colors">
           Search
         </button>
       </form>
 
-      <div className="mb-4">
-        <select
+      <div className="mb-4 flex flex-wrap items-center">
+      <select
           value={category}
           onChange={handleCategoryChange}
-          className="border p-2 mr-2"
+          className="border p-2 mr-2 rounded"
         >
-          <option value="">All Categories</option>
+          <option value="All Categories">All Categories</option>
           {categories.map((cat) => (
             <option key={cat} value={cat}>
               {cat}
@@ -129,7 +159,7 @@ const ProductGrid = () => {
         <select
           value={`${sortBy}-${order}`}
           onChange={handleSortChange}
-          className="border p-2 mr-2"
+          className="border p-2 mr-2 rounded"
         >
           <option value="id-asc">Sort by ID (Ascending)</option>
           <option value="id-desc">Sort by ID (Descending)</option>
@@ -140,17 +170,21 @@ const ProductGrid = () => {
 
         <button
           onClick={resetFilters}
-          className="bg-red-500 text-white p-2"
+          className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors"
         >
           Reset Filters
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {products.length === 0 ? (
+        <div className="text-center text-gray-500 my-8">No products found</div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
 
       <Pagination
         page={page}
