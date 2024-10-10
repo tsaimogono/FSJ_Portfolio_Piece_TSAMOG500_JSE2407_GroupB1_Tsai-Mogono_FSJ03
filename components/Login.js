@@ -1,10 +1,11 @@
 'use client'; // Enable client-side rendering
 
 import { useState } from 'react';
-import { auth } from '../../lib/firebaseConfig';
+import { auth } from '@/lib/firebase';
+// import { auth } from '../../lib/firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import ErrorMessage from './ErrorMessage';
-import Loading from './Loading';
+// import ErrorMessage from './ErrorMessage';
+// import Loading from './Loading';
 import { useRouter } from 'next/navigation';
 
 const Login = () => {

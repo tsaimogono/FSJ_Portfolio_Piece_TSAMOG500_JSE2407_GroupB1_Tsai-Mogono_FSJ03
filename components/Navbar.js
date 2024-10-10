@@ -15,10 +15,10 @@ const Navbar = () => {
           <Link href="/contact">Contact</Link>
         </li>
         
-        <Link href="/login" className="bg-blue-500 px-4 py-2 rounded">
+        <Link href="/Login" className="bg-blue-500 px-4 py-2 rounded">
               Login
             </Link>
-            <Link href="/signup" className="bg-green-500 px-4 py-2 rounded">
+            <Link href="/Signup" className="bg-purple-500 px-4 py-2 rounded">
               Sign Up
             </Link>
       </ul>

@@ -1,7 +1,8 @@
 'use client'; // Enable client-side rendering
 
 import { useState } from 'react';
-import { auth } from '../../lib/firebaseConfig';
+// import { auth } from '../../lib/firebaseConfig';
+import { auth } from '@/lib/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 
