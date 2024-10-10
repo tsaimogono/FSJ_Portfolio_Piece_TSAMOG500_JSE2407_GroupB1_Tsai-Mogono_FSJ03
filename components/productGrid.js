@@ -26,7 +26,8 @@ const ProductGrid = () => {
     const fetchCategories = async () => {
       try {
         const fetchedCategories = await getCategories();
-        setCategories(fetchedCategories);
+        console.log(fetchedCategories)
+        setCategories(fetchedCategories.categories);
       } catch (err) {
         console.error('Failed to fetch categories:', err);
       }
