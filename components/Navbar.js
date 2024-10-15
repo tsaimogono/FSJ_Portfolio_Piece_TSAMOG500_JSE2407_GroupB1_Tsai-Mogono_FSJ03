@@ -23,7 +23,7 @@ const Navbar = () => {
   return (
     <nav className="bg-gray-600 p-4 text-white">
       <div className="flex items-center justify-between">
-        {/* Left side navigation /}
+        {/* Left side navigation */}
         <ul className="flex space-x-4">
           <li>
             <Link href="/">Home</Link>
@@ -36,7 +36,7 @@ const Navbar = () => {
           </li>
         </ul>
 
-        {/ Right side auth section */}
+        {/*3Right side auth section */}
         <div className="flex items-center space-x-4">
           {user ? (
             <>
