@@ -1,11 +1,10 @@
-"use client"
+"use client";
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import ProductCard from './productCard';
+import ProductCard from './productCard';  // Ensure the case matches the filename
 import Pagination from './Pagination';
-import { getProducts, getCategories } from '../lib/api';
+import { getProducts, getCategories } from '../lib/api'; // Ensure these functions are correctly implemented
 
-// Custom debounce function
 const useDebounce = (callback, delay) => {
   const timeoutRef = useRef(null);
 
@@ -21,7 +20,6 @@ const useDebounce = (callback, delay) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-
     timeoutRef.current = setTimeout(() => {
       callback(...args);
     }, delay);
@@ -30,7 +28,7 @@ const useDebounce = (callback, delay) => {
 
 const ProductGrid = () => {
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState([]); // Initialize as an empty array
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalProducts, setTotalProducts] = useState(0);
@@ -45,6 +43,7 @@ const ProductGrid = () => {
   const page = parseInt(searchParams.get('page') || '1', 10);
   const limit = 20;
 
+  // Fetch products with pagination, sorting, and searching
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -67,11 +66,12 @@ const ProductGrid = () => {
     }
   }, [page, sortBy, order, category, search, limit]);
 
+  // Fetch categories when component mounts
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const fetchedCategories = await getCategories();
-        setCategories(fetchedCategories.categories);
+        const fetchedCategories = await getCategories(); // Ensure this function returns the expected structure
+        setCategories(fetchedCategories.categories || []); // Set to empty array if undefined
       } catch (err) {
         console.error('Failed to fetch categories:', err);
       }
@@ -79,10 +79,12 @@ const ProductGrid = () => {
     fetchCategories();
   }, []);
 
+  // Fetch products whenever relevant params change
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
+  // Update URL parameters for searching, sorting, and pagination
   const updateUrl = useCallback((newParams) => {
     const params = new URLSearchParams(searchParams.toString());
     Object.entries(newParams).forEach(([key, value]) => {
@@ -121,6 +123,7 @@ const ProductGrid = () => {
     router.push('/');
   };
 
+  // Loading and error states
   if (loading) return <div className="flex justify-center items-center h-64">Loading...</div>;
   if (error) return <div className="text-red-500 text-center">{error}</div>;
 
@@ -143,7 +146,7 @@ const ProductGrid = () => {
       </form>
 
       <div className="mb-4 flex flex-wrap items-center">
-      <select
+        <select
           value={category}
           onChange={handleCategoryChange}
           className="border p-2 mr-2 rounded"
@@ -163,34 +166,24 @@ const ProductGrid = () => {
         >
           <option value="id-asc">Sort by ID (Ascending)</option>
           <option value="id-desc">Sort by ID (Descending)</option>
-          <option value="price-asc">Price: Low to High</option>
-          <option value="price-desc">Price: High to Low</option>
-          <option value="rating-desc">Top Rated</option>
+          <option value="price-asc">Sort by Price (Low to High)</option>
+          <option value="price-desc">Sort by Price (High to Low)</option>
+          <option value="name-asc">Sort by Name (A-Z)</option>
+          <option value="name-desc">Sort by Name (Z-A)</option>
         </select>
 
-        <button
-          onClick={resetFilters}
-          className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors"
-        >
+        <button onClick={resetFilters} className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition-colors">
           Reset Filters
         </button>
       </div>
 
-      {products.length === 0 ? (
-        <div className="text-center text-gray-500 my-8">No products found</div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {products.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
 
-      <Pagination
-        page={page}
-        totalPages={totalPages}
-        handlePageChange={handlePageChange}
-      />
+      <Pagination currentPage={page} totalPages={totalPages} onPageChange={handlePageChange} />
     </div>
   );
 };

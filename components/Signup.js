@@ -1,7 +1,6 @@
-'use client'; // Enable client-side rendering
-
+'use client';
 import { useState } from 'react';
-import { auth } from '@/lib/firebase'; // Ensure the correct path based on your project structure
+import { auth } from '@/lib/firebase'; 
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 
@@ -17,24 +16,24 @@ const Signup = () => {
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      router.push('/'); // Redirect to home after successful signup
+      router.push('/'); 
     } catch (err) {
-      setError(err.message); // Set error message
+      setError(err.message);
     }
   };
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Side - Image or Illustration */}
+      {/* Left Side Illustration */}
       <div className="hidden md:flex md:w-1/2 bg-gradient-to-tr from-purple-500 to-indigo-600 items-center justify-center p-10">
         <img
-          src="/signup-illustration.svg" // Replace with your own image
+          src="/signup-illustration.svg"
           alt="Signup Illustration"
           className="w-3/4 h-auto"
         />
       </div>
 
-      {/* Right Side - Signup Form */}
+      {/* Right Side Signup Form */}
       <div className="flex flex-col justify-center w-full md:w-1/2 px-8 py-12 bg-gray-50">
         <div className="max-w-md mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Join Us Today</h2>
