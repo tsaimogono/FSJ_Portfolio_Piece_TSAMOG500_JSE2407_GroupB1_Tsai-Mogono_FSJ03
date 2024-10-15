@@ -1,4 +1,3 @@
-
 // app/components/Navbar.js
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
