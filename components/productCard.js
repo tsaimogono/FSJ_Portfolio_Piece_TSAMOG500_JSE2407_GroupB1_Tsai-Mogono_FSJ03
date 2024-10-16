@@ -35,25 +35,25 @@ const ProductCard = ({ product }) => {
   ));
 
   return (
-    <div className="border p-4 rounded-lg shadow-lg bg-white">
-      <div className="relative">
+    <div className="border p-4 rounded-lg shadow-md bg-white">
+      <div className="relative h-48 overflow-hidden flex justify-center items-center">
         <img
           src={product.images[currentImageIndex]}
           alt={product.title}
-          className="w-full h-40 object-contain"
+          className="object-contain max-h-full w-auto"
         />
         {product.images.length > 1 && (
-          <div className="absolute top-0 left-0 w-full h-full flex justify-between items-center px-2">
+          <div className="absolute inset-0 flex justify-between items-center px-2">
             <button
               onClick={() => setCurrentImageIndex(currentImageIndex - 1)}
-              className="bg-gray-800 text-white p-1 rounded"
+              className="bg-gray-800 text-white p-1 rounded-full"
               disabled={currentImageIndex === 0}
             >
               ‹
             </button>
             <button
               onClick={() => setCurrentImageIndex(currentImageIndex + 1)}
-              className="bg-gray-800 text-white p-1 rounded"
+              className="bg-gray-800 text-white p-1 rounded-full"
               disabled={currentImageIndex === product.images.length - 1}
             >
               ›
@@ -61,15 +61,15 @@ const ProductCard = ({ product }) => {
           </div>
         )}
       </div>
-      <h2 className="text-lg font-bold mt-2">{product.title}</h2>
-      <p className="text-purple-900 font-bold">${product.price}</p>
-      <p className="text-gray-800">{product.category}</p>
-      <div className="flex items-center mt-2">
+      <h2 className="text-lg font-bold mt-3 text-center">{product.title}</h2>
+      <p className="text-purple-900 font-bold text-center">${product.price}</p>
+      <p className="text-gray-800 text-sm text-center">{product.category}</p>
+      <div className="flex items-center justify-center mt-2">
         {stars}
         <span className="ml-2 text-gray-600">{product.rating.toFixed(1)}</span>
       </div>
       <Link href={`/product/${product.id}`}>
-        <button className="bg-gray-500 text-white py-2 px-4 mt-2 rounded-lg transition duration-300 hover:bg-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
+        <button className="bg-blue-500 text-white w-full py-2 mt-3 rounded-lg transition hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
           View Details
         </button>
       </Link>
