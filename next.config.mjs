@@ -1,7 +1,15 @@
-// next.config.js
-module.exports = {
+/ @type {import('next').NextConfig} */
+const nextConfig = {
     images: {
-      domains: ['example.com', 'another-domain.com'],
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "cdn.dummyjson.com",
+                port: "",
+                pathname: "/"
+            },
+        ],
     },
-  };
-  
+};
+
+export default nextConfig;

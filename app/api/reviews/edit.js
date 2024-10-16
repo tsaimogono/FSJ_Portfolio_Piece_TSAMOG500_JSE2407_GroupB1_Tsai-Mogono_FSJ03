@@ -1,14 +1,35 @@
-import { db } from "@/firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
+import { app } from "@/firebaseConfig";
+
+const db = getFirestore(app);
 
 export async function PUT(req, { params }) {
-  const { rating, comment } = await req.json();
-  const reviewRef = doc(db, "products", params.productId, "reviews", params.reviewId);
+  const { id } = params;
+  const { reviewId, comment, rating, date } = await req.json();
+  const paddedId = id.toString().padStart(3, "0");
 
   try {
-    await updateDoc(reviewRef, { rating, comment, date: new Date().toISOString() });
-    return NextResponse.json({ message: "Review updated successfully" });
+    const productRef = doc(db, "products", paddedId);
+    const productSnapshot = await getDoc(productRef);
+    const productData = productSnapshot.data();
+    const reviews = productData.reviews || [];
+
+    if (reviewId < 0 || reviewId >= reviews.length) {
+      return new Response(JSON.stringify({ error: "Review not found" }), { status: 400 });
+    }
+
+    const updatedReviews = [...reviews];
+    updatedReviews[reviewId] = { ...updatedReviews[reviewId], comment, rating, date };
+
+    await updateDoc(productRef, {
+      reviews: updatedReviews,
+    });
+
+    return new Response(JSON.stringify({ message: "Review updated successfully!" }), { status: 200 });
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return new Response(
+      JSON.stringify({ error: "Failed to update review", details: error.message }),
+      { status: 500 }
+    );
   }
 }
