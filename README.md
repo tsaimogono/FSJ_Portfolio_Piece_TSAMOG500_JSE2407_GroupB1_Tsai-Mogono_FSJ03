@@ -38,18 +38,38 @@ npm
 ## Installation
 
 Clone the repository:
-Copygit clone https://github.com/tsaimogono/TSAMOG500-JSE2407-B1-TSAI-MOGONO-FSJ02.git
+Copygit clone https://github.com/tsaimogono/FSJ_Portfolio_Piece_TSAMOG500_JSE2407_GroupB1_Tsai-Mogono_FSJ03.git
 
 Navigate to the project directory:
 Copycd nextjs-ecommerce-catalog
-
-Install dependencies:
-Copynpm install
 
 Run the development server:
 Copynpm run dev
 
 Open http://localhost:3000 in your browser to view the application.
+
+
+bash
+Copy code
+Install dependencies:
+
+bash
+Copy code
+npm install
+Configure Firebase:
+
+
+
+Create a .env.local file with your Firebase credentials:
+
+bash
+Copy codeNEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyDZ3c4r9uCBda6_L31BCKHXrh3thy0q3hE
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=final-portfolio-data.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=final-portfolio-data
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=final-portfolio-data.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=783527241974
+NEXT_PUBLIC_FIREBASE_APP_ID=1:783527241974:web:30018d6445e02705d064d7
+NEXT_PUBLIC_API_URL=http://localhost:3000
 
 Project Structure
 Copy.
@@ -101,3 +121,7 @@ Optimize images and implement lazy loading for better performance
 Contributions are welcome! Please feel free to submit a Pull Request.
 License
 This project is licensed under the MIT License.
+
+
+
+
