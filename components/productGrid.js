@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import ProductCard from './productCard'; // Ensure the case matches the filename
+import ProductCard from './ProductCard'; // Ensure the case matches the filename
 import Pagination from './Pagination';
 import { getCategories } from '../lib/api'; // Ensure this function returns the expected structure
 
@@ -168,7 +168,11 @@ const ProductGrid = () => {
         </button>
       </div>
 
-      
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {products.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
 
       <Pagination
         currentPage={page}
