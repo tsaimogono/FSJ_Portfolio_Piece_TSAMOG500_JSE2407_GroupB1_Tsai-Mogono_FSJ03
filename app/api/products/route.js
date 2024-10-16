@@ -1,92 +1,72 @@
-// pages/api/products/index.js (or your specific API route file)
-import { collection, getDocs, query, where, orderBy, limit, startAfter } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { collection, getDocs, query, orderBy, where } from 'firebase/firestore';
+import { db } from '../../../lib/firebase'; // Ensure this path is correct
 import Fuse from 'fuse.js';
 
+/**
+ * Handles the GET request for fetching paginated, filtered, and sorted products.
+ * 
+ * @param {Request} req - The incoming request object.
+ * @returns {Response} - The outgoing response object.
+ */
 export async function GET(req) {
+  // Extract query parameters from the URL
   const { searchParams } = new URL(req.url);
-  const categories = searchParams.get("categories")?.split(',').filter(Boolean) || [];
-  const search = searchParams.get("search");
-  const sortBy = searchParams.get("sortBy") || "id";
-  const order = searchParams.get("order") || "asc";
-  const page = parseInt(searchParams.get("page") || "1", 10);
-  const pageSize = parseInt(searchParams.get("pageSize") || "20");
+  const page = parseInt(searchParams.get('page')) || 1;
+  const pageSize = parseInt(searchParams.get('pageSize')) || 20;
+  const sortBy = searchParams.get('sortBy') || 'price';
+  const order = searchParams.get('order') === 'desc' ? 'desc' : 'asc';
+  const category = searchParams.get('category') || '';
+  const search = searchParams.get('search') || '';
 
   try {
-    let q = collection(db, "products");
-    let queryConstraints = [];
+    const productsRef = collection(db, 'products');
 
-    // Apply category filter
-    if (categories.length > 0 && !categories.includes("All Categories")) {
-      if (categories.length > 10) {
-        return new Response(JSON.stringify({ error: "Cannot filter by more than 10 categories." }), { 
-          status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        });
-      }
-      queryConstraints.push(where("category", "in", categories));
+    // Build Firestore query
+    let q = query(productsRef);
+    
+    // If category is specified, filter by category
+    if (category) {
+      q = query(q, where('category', '==', category));
     }
 
-    // Apply sorting
-    queryConstraints.push(orderBy(sortBy, order === "asc" ? "asc" : "desc"));
-
-    // Apply pagination
-    queryConstraints.push(limit(pageSize));
-
-    if (page > 1) {
-      // Fetch the last document of the previous page
-      const prevPageQuery = query(q, ...queryConstraints, limit((page - 1) * pageSize));
-      const prevPageSnapshot = await getDocs(prevPageQuery);
-      const lastVisibleDoc = prevPageSnapshot.docs[prevPageSnapshot.docs.length - 1];
-      if (lastVisibleDoc) {
-        queryConstraints.push(startAfter(lastVisibleDoc));
-      }
+    // Apply sorting if sortBy is specified
+    if (sortBy) {
+      q = query(q, orderBy(sortBy, order));
     }
 
-    // Apply all constraints
-    q = query(q, ...queryConstraints);
+    // Fetch products from Firestore
+    const snapshot = await getDocs(q);
+    let products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    // Fetch paginated products
-    const querySnapshot = await getDocs(q);
-    let products = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-
-    // Apply search filter using Fuse.js
+    // Search functionality using Fuse.js if search term is provided
     if (search) {
-      const fuse = new Fuse(products, {
-        keys: ['title'],
-        includeScore: true,
-        threshold: 0.4,
-      });
-
+      const fuse = new Fuse(products, { keys: ['title'], threshold: 0.3 });
       const searchResults = fuse.search(search);
       products = searchResults.map(result => result.item);
     }
 
-    // Fetch total count (considering category filter)
-    let countQuery = collection(db, "products");
-    if (categories.length > 0 && !categories.includes("All Categories")) {
-      countQuery = query(countQuery, where("category", "in", categories));
-    }
-    const countSnapshot = await getDocs(countQuery);
-    const totalProducts = countSnapshot.size;
+    // Pagination logic
+    const startIndex = (page - 1) * pageSize;
+    const paginatedProducts = products.slice(startIndex, startIndex + pageSize);
 
-    const totalPages = Math.ceil(totalProducts / pageSize);
-
-    return new Response(JSON.stringify({
-      products,
-      currentPage: page,
-      totalPages,
-      totalProducts,
-      pageSize
-    }), { 
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    // Return the paginated products
+    return new Response(
+      JSON.stringify({
+        products: paginatedProducts,
+        total: products.length,
+        currentPage: page,
+        totalPages: Math.ceil(products.length / pageSize),
+      }), 
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
-    console.error("Error fetching products:", error);
-    return new Response(JSON.stringify({ error: "Failed to fetch products." }), { 
+    console.error('Error fetching products:', error);
+    return new Response(JSON.stringify({ message: 'Failed to fetch products' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }

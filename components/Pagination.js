@@ -1,19 +1,45 @@
 import React from 'react';
 
+/**
+ * Pagination component to navigate through pages of products.
+ * 
+ * @param {Object} props - The props for the component.
+ * @param {number} props.currentPage - The current active page.
+ * @param {number} props.totalPages - The total number of pages.
+ * @param {Function} props.onPageChange - Function to handle page change.
+ */
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const handlePageClick = (page) => {
+    onPageChange(page);
+  };
 
   return (
-    <div className="mt-8 flex justify-center">
-      {pages.map((page) => (
+    <div className="flex justify-center mt-4">
+      <button
+        onClick={() => handlePageClick(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="border p-2 mx-1 rounded disabled:opacity-50"
+      >
+        Previous
+      </button>
+
+      {Array.from({ length: totalPages }, (_, index) => (
         <button
-          key={page}
-          onClick={() => onPageChange(page)}
-          className={`mx-1 px-4 py-2 border rounded ${page === currentPage ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          key={index + 1}
+          onClick={() => handlePageClick(index + 1)}
+          className={`border p-2 mx-1 rounded ${currentPage === index + 1 ? 'bg-blue-500 text-white' : ''}`}
         >
-          {page}
+          {index + 1}
         </button>
       ))}
+
+      <button
+        onClick={() => handlePageClick(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="border p-2 mx-1 rounded disabled:opacity-50"
+      >
+        Next
+      </button>
     </div>
   );
 };

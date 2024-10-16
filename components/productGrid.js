@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import ProductCard from './productCard';  // Ensure the case matches the filename
+import ProductCard from './ProductCard'; // Ensure the case matches the filename
 import Pagination from './Pagination';
-import { getProducts, getCategories } from '../lib/api'; // Ensure these functions are correctly implemented
+import { getCategories } from '../lib/api'; // Ensure this function returns the expected structure
 
 const useDebounce = (callback, delay) => {
   const timeoutRef = useRef(null);
@@ -28,7 +28,7 @@ const useDebounce = (callback, delay) => {
 
 const ProductGrid = () => {
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]); // Initialize as an empty array
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalProducts, setTotalProducts] = useState(0);
@@ -43,19 +43,15 @@ const ProductGrid = () => {
   const page = parseInt(searchParams.get('page') || '1', 10);
   const limit = 20;
 
-  // Fetch products with pagination, sorting, and searching
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getProducts({
-        page,
-        limit,
-        sortBy,
-        order,
-        category: category === "All Categories" ? "" : category,
-        search
-      });
+      const response = await fetch(`/api/products?page=${page}&pageSize=${limit}&sortBy=${sortBy}&order=${order}&category=${category}&search=${search}`);
+      if (!response.ok) {
+        throw new Error('Failed to load products');
+      }
+      const data = await response.json();
       setProducts(data.products);
       setTotalProducts(data.total);
     } catch (err) {
@@ -66,12 +62,11 @@ const ProductGrid = () => {
     }
   }, [page, sortBy, order, category, search, limit]);
 
-  // Fetch categories when component mounts
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const fetchedCategories = await getCategories(); // Ensure this function returns the expected structure
-        setCategories(fetchedCategories.categories || []); // Set to empty array if undefined
+        const fetchedCategories = await getCategories();
+        setCategories(fetchedCategories.categories || []);
       } catch (err) {
         console.error('Failed to fetch categories:', err);
       }
@@ -79,12 +74,10 @@ const ProductGrid = () => {
     fetchCategories();
   }, []);
 
-  // Fetch products whenever relevant params change
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
-  // Update URL parameters for searching, sorting, and pagination
   const updateUrl = useCallback((newParams) => {
     const params = new URLSearchParams(searchParams.toString());
     Object.entries(newParams).forEach(([key, value]) => {
@@ -97,17 +90,14 @@ const ProductGrid = () => {
     router.push(`/?${params.toString()}`);
   }, [searchParams, router]);
 
-  const debouncedSearch = useDebounce((value) => {
-    updateUrl({ search: value, page: 1 });
-  }, 300);
-
   const handleSearch = (e) => {
     e.preventDefault();
     updateUrl({ search: e.target.search.value, page: 1 });
   };
 
   const handleCategoryChange = (e) => {
-    updateUrl({ category: e.target.value, page: 1 });
+    const selectedCategory = e.target.value === 'All Categories' ? '' : e.target.value; // Reset category if 'All Categories' is selected
+    updateUrl({ category: selectedCategory, page: 1 });
   };
 
   const handleSortChange = (e) => {
@@ -123,7 +113,6 @@ const ProductGrid = () => {
     router.push('/');
   };
 
-  // Loading and error states
   if (loading) return <div className="flex justify-center items-center h-64">Loading...</div>;
   if (error) return <div className="text-red-500 text-center">{error}</div>;
 
@@ -131,21 +120,20 @@ const ProductGrid = () => {
 
   return (
     <div className="container mx-auto px-4">
-      <form onSubmit={handleSearch} className="mb-4">
+      <form onSubmit={handleSearch} className="mb-4 flex items-center justify-center">
         <input
           type="text"
           name="search"
           placeholder="Search products..."
           defaultValue={search}
-          onChange={(e) => debouncedSearch(e.target.value)}
-          className="border p-2 mr-2 rounded"
+          className="border p-2 rounded w-64"
         />
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-colors">
+        <button type="submit" className="bg-blue-500 text-white p-2 ml-2 rounded hover:bg-blue-600 transition-colors">
           Search
         </button>
       </form>
 
-      <div className="mb-4 flex flex-wrap items-center">
+      <div className="mb-4 flex flex-wrap items-center justify-center">
         <select
           value={category}
           onChange={handleCategoryChange}
@@ -166,24 +154,31 @@ const ProductGrid = () => {
         >
           <option value="id-asc">Sort by ID (Ascending)</option>
           <option value="id-desc">Sort by ID (Descending)</option>
-          <option value="price-asc">Sort by Price (Low to High)</option>
-          <option value="price-desc">Sort by Price (High to Low)</option>
-          <option value="name-asc">Sort by Name (A-Z)</option>
-          <option value="name-desc">Sort by Name (Z-A)</option>
+          <option value="price-asc">Sort by Price (Ascending)</option>
+          <option value="price-desc">Sort by Price (Descending)</option>
+          <option value="title-asc">Sort by Title (Ascending)</option>
+          <option value="title-desc">Sort by Title (Descending)</option>
         </select>
 
-        <button onClick={resetFilters} className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition-colors">
+        <button
+          onClick={resetFilters}
+          className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors"
+        >
           Reset Filters
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {products.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
 
-      <Pagination currentPage={page} totalPages={totalPages} onPageChange={handlePageChange} />
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 };

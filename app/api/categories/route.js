@@ -1,19 +1,24 @@
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+// pages/api/categories.js
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../../../lib/firebase';
 
-export async function GET() {
+/**
+ * Fetch a list of product categories from Firestore.
+ * 
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * 
+ * @returns {Promise<void>} The API response.
+ */
+export default async function handler(req, res) {
   try {
-    // Reference the subcollection within 'allCategories' document
-    const subCollectionRef = doc(db, "categories", "allCategories");
-    const querySnapshot = await getDoc(subCollectionRef);
+    const categoriesRef = collection(db, 'categories');
+    const snapshot = await getDocs(categoriesRef);
+    const categories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    // Map over the documents to extract the category names
-    const categories = querySnapshot.data();
-
-    // Return the categories in a successful response
-    return new Response(JSON.stringify(categories), { status: 200 });
+    res.status(200).json(categories);
   } catch (error) {
-    console.error("Error fetching categories:", error); // Log the detailed error
-    return new Response(JSON.stringify({ error: "Failed to fetch categories." }), { status: 500 });
+    console.error('Error fetching categories:', error);
+    res.status(500).json({ message: 'Failed to fetch categories' });
   }
 }

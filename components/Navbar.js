@@ -36,7 +36,7 @@ const Navbar = () => {
           </li>
         </ul>
 
-        {/*3Right side auth section */}
+        {/* Right side auth section */}
         <div className="flex items-center space-x-4">
           {user ? (
             <>

@@ -1,24 +1,30 @@
-import { getFirestore, doc, updateDoc, arrayUnion } from "firebase/firestore";
-import { app } from "@/firebaseConfig";
+import { db } from '../../../lib/firebaseConfig';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { verifyToken } from '../../middleware/verifyToken';
 
-const db = getFirestore(app);
+export default async function handler(req, res) {
+  await verifyToken(req, res, async () => {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
 
-export async function POST(req, { params }) {
-  const { id } = params;
-  const paddedId = id.toString().padStart(3, "0");
+    const { productId, rating, comment } = req.body;
+    const { email, name } = req.user;
 
-  const newReview = await req.json();
+    try {
+      const reviewRef = collection(db, 'products', productId, 'reviews');
+      await addDoc(reviewRef, {
+        rating,
+        comment,
+        email,
+        name,
+        date: Timestamp.now(),
+      });
 
-  try {
-    const productRef = doc(db, "products", paddedId);
-    await updateDoc(productRef, {
-      reviews: arrayUnion(newReview),
-    });
-    return new Response(JSON.stringify({ message: "Review added successfully!" }), { status: 200 });
-  } catch (error) {
-    return new Response(
-      JSON.stringify({ error: "Failed to add review", details: error.message }),
-      { status: 500 }
-    );
-  }
+      res.status(200).json({ message: 'Review added successfully' });
+    } catch (error) {
+      console.error('Error adding review:', error);
+      res.status(500).json({ error: 'Error adding review' });
+    }
+  });
 }
